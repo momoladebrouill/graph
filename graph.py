@@ -1,24 +1,35 @@
-import random,tkinter
-'''class LL():
-    def __init__(self):
-        self.ls=list()
-    def append(self,e):
-        if e not in self.ls:
-            self.ls.append(e)
-            return 0
-        return -1
-    __repr__=lambda self:self.ls.__repr__()
-    __iter__=lambda self:self.ls.__iter__()
-    __next__=lambda self:self.ls.__next__()
-    __getitem__=lambda self,v:self.ls.__getitem__(v)
-'''
+import random,tkinter,time
+from colorsys import hsv_to_rgb
 
+class drag():
+    def __init__(s,e=None):
+        s.obj,s.x,s.y=None,0,0
+    def start(s,event):
+        s.obj=c.find_closest(event.x,event.y)[0]
+        s.x=event.x
+        s.y=event.y
+    
+    def drag(s,event):
+        dx=event.x-s.x
+        dy=event.y-s.y
+        c.move(s.obj,dx,dy)
+        sommet=dico[s.obj]
+        c.delete("LINEEEE")
+        s.x=event.x
+        s.y=event.y
+        sommet.x,sommet.y=s.x,s.y
+        for elem in walah:
+            c.create_text(elem.x,elem.y+10,text=elem.name,tags=("LINEEEE",))
+            for ng in elem.ng:
+                c.create_line(elem.x,elem.y,ng.x,ng.y,tags=("LINEEEE",))
+                
 class S():
-    def __init__(this,name:str):
-        this.name=name;
-        this.x,this.y=random.randrange(0,500),random.randrange(0,500)
+    def __init__(this):
+        this.name=''.join(chr(random.randrange(65,90)) for i in range(3));
+        this.coul="#%02x%02x%02x" % tuple([int(c) for c in hsv_to_rgb(random.random(),1,255)]);
+        this.x,this.y=random.randrange(10,490),random.randrange(10,490)
         this.ng=list();
-        this.entier=True;
+        this.visited=0;
         
     def addmany(self,others:iter):
         for elem in others:
@@ -33,32 +44,96 @@ class S():
 
     def parcours(self,n):
         liste=[self];
-        self.entier=False
+        visitsession=hash(time.time())
+        self.visited=visitsession
         for k in range(n):
             nl=list();
             for yota in liste:
-                for elem in yota.ng:
-                    if elem.entier:
-                        nl.append(elem);
-                        elem.entier=False
-            liste=nl;
+                nl+=[elem for elem in yota.ng if elem.visited!=visitsession]
+                for elem in nl: elem.visited=vistsession
+            liste=nl[:];
         return liste;
-    __repr__=lambda this:this.name;
+    
+    def dist(self,other):
+        liste=[self];
+        visitsession=hash(time.time())
+        self.visited=visitsession
+        dist=0
+        for k in range(n):
+            nl=list();
+            for yota in liste:
+                if yota==other:
+                        return dist
+                nl+=[elem for elem in yota.ng if elem.visited!=visitsession]
+                for elem in nl:
+                    elem.visited=vistsession
+                    
+            liste=nl[:];
+            dist+=1
+        return liste;
+    
+    __repr__=lambda this:this.name
 
-walah=list()
-word=lambda : ''.join(chr(random.randrange(65,90)) for i in range(10))
-for i in range(5):
-    walah.append(S(word()))
-for elem in walah:
-    for i in range(1,3):
-        random.choice(walah).add(elem)
+class Graph():
+    def __init__(s,ls):
+        s.ls=ls
+    def __getitem__(this,arg):
+        if type(arg)==int:
+            return self.ls[arg]
+        if type(arg)==str:
+            arg=arg.upper()
+            for elem in this.ls:
+                if elem.name==arg:
+                    return elem
+            raise KeyError
+        raise TypeError
+        
+    __repr__=lambda self:self.ls.__repr__()
+    __iter__=lambda self:self.ls.__iter__()
+    __next__=lambda self:self.ls.__next__()
+    __len__=lambda this:len(this.ls)
+    
+def random_graph(nb_points:int,nb_links=3):
+    walah=[S() for i in range(nb_points)]
+    for elem in walah[::random.randint(1,3)]:
+        for i in range(nb_links):
+            random.choice(walah).add(elem)
+    return walah
+
+def complete_graph(nb_points):
+    walah=[]
+    for i in range(nb_points):
+        walah.append(S())
+        for elem in walah[:-1]:
+            elem.add(walah[-1])
+    return walah
+
+def complete_graph_recur(nb_points,ls=[]):
+    if nb_points==0:return ls
+    new=S()
+    for elem in ls:
+        elem.add(new)
+    ls.append(new)
+    return complete_graph_recur(nb_points-1,ls)
+
+    
+
+walah=Graph(random_graph(10,3))
+drag=drag()
+
 f=tkinter.Tk()
 c=tkinter.Canvas(f)
 c.config(width=500,height=500)
+c.tag_bind("toma","<ButtonPress>",drag.start)
+c.tag_bind("toma","<ButtonRelease>",drag.__init__)
+c.tag_bind("toma","<B1-Motion>",drag.drag)
 c.pack()
+
+dico={}
 for elem in walah:
-    c.create_oval(elem.x-5,elem.y-5,elem.x+5,elem.y+5,fill="red")
-    c.create_text(elem.x,elem.y,text=elem.name)
+    res=c.create_oval(elem.x-10,elem.y-10,elem.x+10,elem.y+10,fill=elem.coul,tags=('toma',))
+    dico[res]=elem
+    c.create_text(elem.x,elem.y+10,text=elem.name,tags=("LINEEEE",))
     for ng in elem.ng:
-        c.create_line(elem.x,elem.y,ng.x,ng.y)
-    
+        c.create_line(elem.x,elem.y,ng.x,ng.y,tags=("LINEEEE",))
+
