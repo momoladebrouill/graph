@@ -18,11 +18,19 @@ class drag():
         s.x=event.x
         s.y=event.y
         sommet.x,sommet.y=s.x,s.y
-        for elem in walah:
+        s.update()
+    def update(yuobala):
+        for elem in g:
             c.create_text(elem.x,elem.y+10,text=elem.name,tags=("LINEEEE",))
             for ng in elem.ng:
                 c.create_line(elem.x,elem.y,ng.x,ng.y,tags=("LINEEEE",))
-                
+        dico={}
+        for elem in g:
+            res=c.create_oval(elem.x-10,elem.y-10,elem.x+10,elem.y+10,fill=elem.coul,tags=('toma',))
+            dico[res]=elem
+            c.create_text(elem.x,elem.y+10,text=elem.name,tags=("LINEEEE",))
+            for ng in elem.ng:
+                c.create_line(elem.x,elem.y,ng.x,ng.y,tags=("LINEEEE",)) 
 class S():
     def __init__(this):
         this.name=''.join(chr(random.randrange(65,90)) for i in range(3));
@@ -30,6 +38,7 @@ class S():
         this.x,this.y=random.randrange(10,490),random.randrange(10,490)
         this.ng=list();
         this.visited=0;
+        this.p=[];
         
     def addmany(self,others:iter):
         for elem in others:
@@ -59,18 +68,21 @@ class S():
         visitsession=hash(time.time())
         self.visited=visitsession
         dist=0
-        for k in range(n):
+        for elem in g:g.p=[]
+        while liste:
             nl=list();
             for yota in liste:
                 if yota==other:
-                        return dist
-                nl+=[elem for elem in yota.ng if elem.visited!=visitsession]
+                        return dist,yota.p+[yota]
+                for elem in yota.ng:
+                    if elem.visited-visitsession:
+                        nl.append(elem)
+                        elem.p=yota.p+[yota]
                 for elem in nl:
-                    elem.visited=vistsession
-                    
+                    elem.visited=visitsession
             liste=nl[:];
             dist+=1
-        return liste;
+        return -1;
     
     __repr__=lambda this:this.name
 
@@ -85,8 +97,10 @@ class Graph():
             for elem in this.ls:
                 if elem.name==arg:
                     return elem
-            raise KeyError
+            raise KeyError(arg)
         raise TypeError
+    def doforall(this,func):
+        for elem in this:func(this)
         
     __repr__=lambda self:self.ls.__repr__()
     __iter__=lambda self:self.ls.__iter__()
@@ -118,7 +132,7 @@ def complete_graph_recur(nb_points,ls=[]):
 
     
 
-walah=Graph(random_graph(10,3))
+g=Graph(random_graph(10,3))
 drag=drag()
 
 f=tkinter.Tk()
@@ -129,11 +143,5 @@ c.tag_bind("toma","<ButtonRelease>",drag.__init__)
 c.tag_bind("toma","<B1-Motion>",drag.drag)
 c.pack()
 
-dico={}
-for elem in walah:
-    res=c.create_oval(elem.x-10,elem.y-10,elem.x+10,elem.y+10,fill=elem.coul,tags=('toma',))
-    dico[res]=elem
-    c.create_text(elem.x,elem.y+10,text=elem.name,tags=("LINEEEE",))
-    for ng in elem.ng:
-        c.create_line(elem.x,elem.y,ng.x,ng.y,tags=("LINEEEE",))
+
 
